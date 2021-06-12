@@ -1,0 +1,29 @@
+CREATE TABLE productreviews3 (
+asin VARCHAR,
+helpful VARCHAR,
+overall VARCHAR,
+reviewText VARCHAR,
+reviewTime VARCHAR,
+reviewerID VARCHAR,
+reviewerName VARCHAR,
+summary VARCHAR,
+unixReviewTime VARCHAR,
+)
+
+\c takeaway
+
+COPY productreviewsz FROM PROGRAM 'gzip -c /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gzip' DELIMITER ',' CSV HEADER;
+COPY productreviewsz FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV HEADER;
+
+31 to 50 is good
+problem between 20 and 50
+split -l 1000000 -a 4 item_dedup.json products/smaller_
+split -l 1000000 -a 4 metadata.json metadata/smaller_
+
+
+maybe delete when overall is empty
+
+type my code
+
+There's an interesting trade off between compressing with spark (which takes time, but saves disk) or
+work with uncompressed files - which saves time but makes us require more disk
