@@ -1,4 +1,27 @@
-CREATE TABLE productreviews3 (
+# Objective
+Get a 20gb json.gzip and make a DWH Star Schema model with it.
+Using postgreSQL Locally + Spark + Airflow (to be added)
+
+# Info on the data
+The data is available at:
+Reviews: https://s3-eu-west-1.amazonaws.com/bigdata-team/job-interview/item_dedup.json.gz
+Metadata: https://s3-eu-west-1.amazonaws.com/bigdata-team/job-interview/metadata.json.gz
+Note: The users are not authorized to access the S3 bucket but the files can be accessed. Do not attempt to access the s3 bucket instead download the files .
+Some descriptives on the dataset can be found at: http://jmcauley.ucsd.edu/data/amazon/links.html
+
+
+
+# Some linux/macos commands to make the processing of the json.gzip easier
+# to unzip the json.gz first, this will take the double of the space of the json.gz
+gunzip filename.json.gz
+rm filename.json.gz
+# splitting the unzipped json - put 500k records in each file
+split -l 500000 -a 4 item_dedup.json products/smaller_
+split -l 500000 -a 4 metadata.json metadata/smaller_
+
+
+# creating staging table for product reviews
+CREATE TABLE productreviews (
 asin VARCHAR,
 helpful VARCHAR,
 overall VARCHAR,
@@ -10,20 +33,18 @@ summary VARCHAR,
 unixReviewTime VARCHAR,
 )
 
+# PSQL command to select my database
 \c takeaway
-
+# commands to copy csvs in staging area in postgresql
 COPY productreviewsz FROM PROGRAM 'gzip -c /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gzip' DELIMITER ',' CSV HEADER;
 COPY productreviewsz FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV HEADER;
 
-31 to 50 is good
-problem between 20 and 50
-split -l 1000000 -a 4 item_dedup.json products/smaller_
-split -l 1000000 -a 4 metadata.json metadata/smaller_
 
-
+# Add notes
 maybe delete when overall is empty
 
 type my code
 
 There's an interesting trade off between compressing with spark (which takes time, but saves disk) or
 work with uncompressed files - which saves time but makes us require more disk
+#
