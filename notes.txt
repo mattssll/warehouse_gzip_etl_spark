@@ -20,7 +20,7 @@ split -l 500000 -a 4 item_dedup.json products/smaller_
 split -l 500000 -a 4 metadata.json metadata/smaller_
 
 
-# creating staging table for product reviews
+# creating staging table for product reviews and metadata
 CREATE TABLE productreviews (
 asin VARCHAR,
 helpful VARCHAR,
@@ -32,13 +32,41 @@ reviewerName VARCHAR,
 summary VARCHAR,
 unixReviewTime VARCHAR,
 )
+CREATE TABLE pmetadata (
+asin VARCHAR,
+category VARCHAR,
+title VARCHAR,
+price DOUBLE PRECISION,
+img_url VARCHAR,
+description VARCHAR,
+brand VARCHAR,
+also_bought VARCHAR,
+also_viewed VARCHAR,
+bought_together VARCHAR,
+buy_after_viewing VARCHAR,
+sales_rank_type VARCHAR,
+sales_rank_pos INTEGER
+)
+./build/programs/clickhouse-client --query='CREATE TABLE productreviews (asin Nullable(String),helpful Nullable(String),overall Nullable(String),reviewText Nullable(String),reviewTime Nullable(String),reviewerID Nullable(String),reviewerName Nullable(String),summary Nullable(String),unixReviewTime Nullable(String)) ENGINE = Log;' --config-file ./programs/server/config.xml
 
+for FILENAME in products/smal*; do
+      ./Clickhouse/build/programs/clickhouse-client --config-file ./Clickhouse/programs/server/config.xml \
+      --query="INSERT INTO productreviews FORMAT JSONEachRow" < $FILENAME
+  done
+
+  ./Clickhouse/build/programs/clickhouse-client --config-file ./Clickhouse/programs/server/config.xml \
+  --query='INSERT INTO productreviews FORMAT JSONEachRow'< products/test
+
+echo '{"reviewerID":"ATTZ","asin":"013092","reviewerName":"Colie","helpful": "[1","reviewText":"I was cr","overall":"5","summary": "Masterion", "unixReviewTime": "1340323200", "reviewTime": "06 22, 2012"}'  | ./Clickhouse/build/programs/clickhouse-client --config-file ./Clickhouse/programs/server/config.xml --query="INSERT INTO productreviews FORMAT JSONEachRow"
+./Clickhouse/build/programs/clickhouse-client --config-file ./Clickhouse/programs/server/config.xml --query="SELECT * FROM productreviews FORMAT JSONEachRow"
 # PSQL command to select my database
 \c takeaway
 # commands to copy csvs in staging area in postgresql
 COPY productreviewsz FROM PROGRAM 'gzip -c /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gzip' DELIMITER ',' CSV HEADER;
 COPY productreviewsz FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV HEADER;
+COPY pmetadata FROM PROGRAM 'cat /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part*.csv' DELIMITER ',' CSV;
 
+COPY pmetadata FROM PROGRAM 'cat /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part*.csv' DELIMITER ',' CSV;
 
 # Add notes
 maybe delete when overall is empty
@@ -48,3 +76,12 @@ type my code
 There's an interesting trade off between compressing with spark (which takes time, but saves disk) or
 work with uncompressed files - which saves time but makes us require more disk
 #
+
+# print estimation of how mch time to write stuff
+for x in $(ls /metadatatest/part*.csv);
+do psql -c "copy pmetadata from 'gzip > /metadatatest/$x' csv" takeaway DELIMITER ',' CSV;
+COPY pmetadata TO PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00080-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv.gz';
+COPY pmetadata to PROGRAM '/Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00080-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' DELIMITER ',' CSV;
+COPY pmetadata to PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00068-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' delimiters',' CSV;
+COPY pmetadata TO PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00068-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' DELIMITER ',' CSV;
+COPY dim_reviews ()

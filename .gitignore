@@ -1,3 +1,6 @@
+/metadatatest/
+/airflow/
+dockerfile
 .DS_Store
 .idea/
 __pycache__/
@@ -8,6 +11,6 @@ __pycache__/
 *.json
 /parquet_split/
 /json_split/
-/logs/
+logs.log
 /build/
 /click/
