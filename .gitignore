@@ -1,5 +1,6 @@
 /metadatatest/
 /airflow/
+/app_airflow/
 dockerfile
 .DS_Store
 .idea/
