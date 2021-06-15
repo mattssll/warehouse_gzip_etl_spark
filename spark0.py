@@ -18,7 +18,7 @@ def psql_copy_load():
     con = psycopg2.connect(database="takeaway",user="postgres",password="admin",host="127.0.0.1",port="5432")
     cursor = con.cursor()
     with open("/Users/mateus.leao/Documents/mattssll/takeaway/parquet_split/reviews*.parquet/part-00021-05dbefde-227b-4c2f-97b3-457f398176cb-c000.snappy.parquet", 'r') as f:
-        cursor.copy_from(f, 'public.productreviewsz')
+        cursor.copy_from(f, 'public.<productreviewsz>')
 
     con.commit()
     con.close()

@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import *
 from baseLogger import configure_logger
 
@@ -18,18 +18,29 @@ def clean_data(path: str) -> DataFrame:
     """
     logger.debug("reading data from multiple JSONs and cleaning it")
     df = spark.read.json(path)
-    fixTypedf = df.withColumn("helpful", df["helpful"].cast("string")).withColumn("overall", df["overall"].cast("integer"))
-    #newDf3 = newDf2.withColumn("reviewTime", split(df.reviewTime, " "))
+    df = df.withColumn("helpful", df["helpful"].cast("string")).withColumn("overall", df["overall"].cast("integer"))
+    #df2 = df.select(to_date(df.reviewTime, 'yyyy-MM-dd'))
+    #print("print timestamp", df2.show())
+    df = df.withColumn("month", split(col("reviewTime"), ' ').getItem(0))
+    df = df.withColumn("day", split(col("reviewTime"), ' ').getItem(1)).withColumn("day", regexp_replace(col("day"),",",""))
+    df = df.withColumn("year", split(col("reviewTime"), ' ').getItem(2))
+    df = df.drop("reviewTime")
+    df = df.withColumn('reviewTime',concat('year', lit('-'), 'month',lit('-'), 'day'))
+    cols_to_drop = ['year', 'month', 'day', 'unixReviewTime']
+    df = df.drop(*cols_to_drop)
+    #df = df.withColumn("sales_rank_type", split(col("salesRank"), ':').getItem(0)).withColumn("sales_rank_type", regexp_replace(col("sales_rank_type"),'\{"','')).withColumn("sales_rank_type", regexp_replace(col("sales_rank_type"),'"',''))
 
+    #df = df.withColumn("2", split(col("reviewTime"), ' ', '').getItem(1))
+    #df = df.withColumn("3", split(col("reviewTime"), ' ', '').getItem(2))
     null = u'\u0000'
     colsToClean = ['reviewText','reviewerID', 'summary']
-    fixNullDf = fixTypedf.select(
+    df = df.select(
           *(regexp_replace(col(c), null, '').alias(c) if c in colsToClean else c for
             c in df.columns)
       )
     logger.debug("DataFrame was successfully cleaned")
-    fixNullDf = fixNullDf.dropDuplicates()
-    return fixNullDf
+    df = df.dropDuplicates()
+    return df
 
 def create_sparksql_view_n_query(df: DataFrame, view_name:str, query: str) -> None:
     df.createOrReplaceTempView(view_name)
@@ -40,19 +51,19 @@ def create_sparksql_view_n_query(df: DataFrame, view_name:str, query: str) -> No
 def write_to_csv(df: DataFrame, path: str, compression: str) -> None:
     logger.debug("starting to write dataframe to multiple CSVs")
     print("log: starting to write the csvs, this might take some time")
-    df.write.csv(path = path ,sep=",", header=True, lineSep="\n", escape='"', nullValue=None, compression=compression)
+    df.write.csv(path = path ,sep=",", header=True, lineSep="\n", escape='"', nullValue=None, compression=None)
     logger.debug("Data was successfully written to CSVs")
 
 
 
 cleanedDf = clean_data("products/smaller*")
 #create_sparksql_view_n_query(df = cleanedDf, view_name="productsReview", query="SELECT count(*) FROM {}")
-df2 = cleanedDf.select(countDistinct("reviewerID"))
-df2.show()
+
+cleanedDf.show(500)
 
 
 #write_to_csv(cleanedDf, "/Users/mateus.leao/Documents/mattssll/takeaway/json_split", "None")
-print("log: the csvs were written successfully")
+#print("log: the csvs were written successfully")
 #print(cleanedDf.printSchema())
 #print(cleanedDf.show())
 #changedTypedf.printSchema()

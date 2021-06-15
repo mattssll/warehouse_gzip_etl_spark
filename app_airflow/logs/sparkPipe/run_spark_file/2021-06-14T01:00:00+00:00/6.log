@@ -1,0 +1,54 @@
+[2021-06-15 15:32:41,515] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 15:32:43,941] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 15:32:43,986] {taskinstance.py:1067} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 15:32:44,012] {taskinstance.py:1068} INFO - Starting attempt 6 of 8
+[2021-06-15 15:32:44,305] {taskinstance.py:1069} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 15:32:45,661] {taskinstance.py:1087} INFO - Executing <Task(PythonOperator): run_spark_file> on 2021-06-14T01:00:00+00:00
+[2021-06-15 15:32:46,650] {standard_task_runner.py:52} INFO - Started process 2310 to run task
+[2021-06-15 15:32:46,708] {standard_task_runner.py:76} INFO - Running: ['***', 'tasks', 'run', 'sparkPipe', 'run_spark_file', '2021-06-14T01:00:00+00:00', '--job-id', '53', '--pool', 'default_pool', '--raw', '--subdir', 'DAGS_FOLDER/run_spark_app.py', '--cfg-path', '/tmp/tmpzek6uey2', '--error-file', '/tmp/tmpn67ygm3k']
+[2021-06-15 15:32:46,721] {standard_task_runner.py:77} INFO - Job 53: Subtask run_spark_file
+[2021-06-15 15:32:54,365] {logging_mixin.py:104} INFO - Running <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [running]> on host 4c4793da73b7
+[2021-06-15 15:32:54,976] {local_task_job.py:193} WARNING - Recorded pid 1066 does not match the current pid 2310
+[2021-06-15 15:33:01,694] {process_utils.py:100} INFO - Sending Signals.SIGTERM to GPID 2310
+[2021-06-15 15:33:05,403] {taskinstance.py:1264} ERROR - Received SIGTERM. Terminating subprocesses.
+[2021-06-15 15:33:06,930] {taskinstance.py:1481} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1137, in _run_raw_task
+    self._prepare_and_execute_task_with_callbacks(context, task)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1274, in _prepare_and_execute_task_with_callbacks
+    self.render_templates(context=context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1775, in render_templates
+    self.task.render_template_fields(context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/baseoperator.py", line 989, in render_template_fields
+    self._do_render_template_fields(self, self.template_fields, context, jinja_env, set())
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/baseoperator.py", line 1002, in _do_render_template_fields
+    rendered_content = self.render_template(content, context, jinja_env, seen_oids)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/baseoperator.py", line 1056, in render_template
+    return {key: self.render_template(value, context, jinja_env) for key, value in content.items()}
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/baseoperator.py", line 1056, in <dictcomp>
+    return {key: self.render_template(value, context, jinja_env) for key, value in content.items()}
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/baseoperator.py", line 1039, in render_template
+    return jinja_env.from_string(content).render(**context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/environment.py", line 941, in from_string
+    return cls.from_code(self, self.compile(source), globals, None)
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/environment.py", line 629, in compile
+    source = self._generate(source, name, filename, defer_init=defer_init)
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/environment.py", line 592, in _generate
+    optimized=self.optimized,
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/compiler.py", line 87, in generate
+    generator.visit(node)
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/visitor.py", line 32, in visit
+    return f(node, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/compiler.py", line 760, in visit_Template
+    self.write_commons()
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/compiler.py", line 628, in write_commons
+    self.writeline("if 0: yield None")
+  File "/home/airflow/.local/lib/python3.6/site-packages/jinja2/compiler.py", line 399, in writeline
+    def writeline(self, x, node=None, extra=0):
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1266, in signal_handler
+    raise AirflowException("Task received SIGTERM signal")
+airflow.exceptions.AirflowException: Task received SIGTERM signal
+[2021-06-15 15:33:10,193] {taskinstance.py:1531} INFO - Marking task as UP_FOR_RETRY. dag_id=sparkPipe, task_id=run_spark_file, execution_date=20210614T010000, start_date=20210615T153242, end_date=20210615T153309
+[2021-06-15 15:33:14,083] {process_utils.py:66} INFO - Process psutil.Process(pid=2310, status='terminated', exitcode=1, started='15:32:45') (2310) terminated with exit code 1

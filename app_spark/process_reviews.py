@@ -37,31 +37,9 @@ def clean_data(path: str) -> DataFrame:
     df = df.dropDuplicates()
     return df
 
-def create_sparksql_view_n_query(df: DataFrame, view_name:str, query: str) -> None:
-    df.createOrReplaceTempView(view_name)
-    query = spark.sql(query.format(view_name))
-    print(query)
-    logger.debug("writing to disk")
-
-def write_to_csv(df: DataFrame, numFiles: int, partitionField: str, path: str, compression: str) -> None:
-    logger.debug("starting to write dataframe to multiple CSVs")
-    print("log: starting to write the csvs, this might take some time")
-    df.repartition(numFiles,partitionField).write.csv(path = path ,sep=",", header=False, lineSep="\n", escape='"', nullValue=None, compression=compression)
-    logger.debug("Data was successfully written to CSVs")
 
 
 cleanedDf = clean_data("products/small*")
 #create_sparksql_view_n_query(df = cleanedDf, view_name="productsReview", query="SELECT count(distinct reviewerid) FROM {}")
-
-#print(cleanedDf.count())
-#df = spark.read.json(path)
-#print(cleanedDf.show())
-#print(cleanedDf.count())
-
 write_to_csv(cleanedDf, 30, "reviewTime", "/Users/mateus.leao/Documents/mattssll/takeaway/json_split", None)
 print("log: the csvs were written successfully")
-#print(cleanedDf.printSchema())
-#print(cleanedDf.show())
-#changedTypedf.printSchema()
-#df = spark.read.csv("/Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv")
-#print(df.count())

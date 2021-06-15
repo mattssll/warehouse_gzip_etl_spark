@@ -18,7 +18,7 @@ rm filename.json.gz
 # splitting the unzipped json - put 500k records in each file
 split -l 500000 -a 4 item_dedup.json products/smaller_
 split -l 500000 -a 4 metadata.json metadata/smaller_
-
+zcat originalFile.gct.gz | split -l 10000 - "originalFile.gtc.gz-"
 
 # creating staging table for product reviews and metadata
 CREATE TABLE productreviews (
@@ -66,9 +66,8 @@ COPY productreviewsz FROM PROGRAM 'gzip -c /Users/mateus.leao/Documents/mattssll
 COPY productreviewsz FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV HEADER;
 COPY pmetadata FROM PROGRAM 'cat /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part*.csv' DELIMITER ',' CSV;
 
-COPY pmetadata FROM PROGRAM 'cat /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part*.csv' DELIMITER ',' CSV;
-
-# Add notes
+ COPY previews FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV;
+COPY dim_products(asin, category, price) FROM PROGRAM 'gzip -dc /Users/mateus.leao/Documents/mattssll/takeaway/dimproducts/part*.csv.gz' DELIMITER ',' CSV;# Add notes
 maybe delete when overall is empty
 
 type my code
@@ -84,4 +83,122 @@ COPY pmetadata TO PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway
 COPY pmetadata to PROGRAM '/Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00080-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' DELIMITER ',' CSV;
 COPY pmetadata to PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00068-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' delimiters',' CSV;
 COPY pmetadata TO PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/metadatatest/part-00068-17f80d28-9781-4a71-a018-2c8bfba29e39-c000.csv' DELIMITER ',' CSV;
+COPY pmetadata TO PROGRAM 'gzip > /Users/mateus.leao/Documents/mattssll/takeaway/json_split/part*.csv.gz' DELIMITER ',' CSV;
+COPY fact_reviews FROM PROGRAM 'gzip > cat /Users/mateus.leao/Documents/mattssll/takeaway/json_split_csv/part*.csv' DELIMITER ',' CSV;
+COPY productreviews33 FROM PROGRAM 'gzip > cat /Users/mateus.leao/Documents/mattssll/takeaway/json_splitfullgzip/part*.csv.gz' DELIMITER ',' CSV;
+
 COPY dim_reviews ()
+
+#3.8.9
+
+
+airflow db init
+airflow users create \
+    --username admin \
+    --firstname Mateus \
+    --lastname Leao \
+    --role Admin \
+    --email mateusleao81@gmail.com
+airflow webserver --port 8080
+airflow scheduler
+
+
+
+
+
+
+
+
+
+
+SELECT *
+ FROM (
+     SELECT *
+       FROM public.productreviewsz t1
+   ORDER BY t1.reviewTime
+ ) AS new_t1
+ JOIN public.pmetadata t2
+   ON new_t1.asin = t2.asin
+
+SELECT  * FROM public.productreviewsz p
+LEFT JOIN pmetadata m
+ ON m.asin = p.asin
+ order by p.asin;
+
+INSERT INTO public.dim_reviewers
+SELECT reviewerid, reviewername from public.productreviewsz
+GROUP BY reviewerid, reviewername;
+
+
+ create index idx1 on public.productreviewsz(asin);
+ create index idx2 on public.pmetadata(asin);
+
+ explain select * from public.productreviewsz t1, public.pmetadata t2
+ where t1.asin = t2.asin;
+
+
+ EXPLAIN SELECT * FROM public.productreviewsz;
+
+
+ SELECT * FROM public.pmetadata;
+
+
+CREATE TABLE dim_reviewers(
+ reviewerid VARCHAR PRIMARY KEY,
+ name VARCHAR
+)
+
+
+
+
+SELECT count(*) FROM productreviewsz ;
+--83057492
+
+DROP TABLE public.dim_reviews;
+CREATE TABLE public.dim_reviews(
+ reviewID INTEGER PRIMARY KEY,
+ reviewerID VARCHAR,
+ reviewerName VARCHAR,
+ helpful VARCHAR,
+ reviewText VARCHAR,
+ summary VARCHAR
+)
+
+DROP TABLE public.fact_reviews;
+CREATE TABLE fact_reviews (
+reviewID INTEGER PRIMARY KEY
+,asin VARCHAR
+,rating DOUBLE PRECISION
+,reviewTime DATE,
+FOREIGN KEY(asin) REFERENCES public.dim_products(asin)
+);
+
+CREATE TABLE dim_pricebucket (
+asin VARCHAR PRIMARY KEY
+,min DOUBLE PRECISION
+,max DOUBLE PRECISION
+);
+
+CREATE TABLE dim_products (
+asin VARCHAR PRIMARY KEY
+,title VARCHAR
+,price DOUBLE PRECISION
+,category VARCHAR
+);
+INSERT INTO public.dim_products
+ SELECT * from public.pmetadata;
+
+CREATE TABLE dim_productdtl (
+asin VARCHAR PRIMARY KEY
+,also_bought VARCHAR
+,also_viewed VARCHAR
+,bought_together VARCHAR
+,salesranktype VARCHAR
+,salesrankvalue INTEGER
+,imUrl VARCHAR
+,brand VARCHAR
+);
+
+
+select * from public.date
+docker network create airflowflask

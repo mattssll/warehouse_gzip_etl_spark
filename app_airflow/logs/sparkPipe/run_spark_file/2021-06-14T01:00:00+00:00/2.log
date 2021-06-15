@@ -1,0 +1,113 @@
+[2021-06-15 11:58:19,133] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 11:58:19,331] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 11:58:19,344] {taskinstance.py:1067} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 11:58:19,350] {taskinstance.py:1068} INFO - Starting attempt 2 of 5
+[2021-06-15 11:58:19,364] {taskinstance.py:1069} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 11:58:19,457] {taskinstance.py:1087} INFO - Executing <Task(PythonOperator): run_spark_file> on 2021-06-14T01:00:00+00:00
+[2021-06-15 11:58:19,549] {standard_task_runner.py:52} INFO - Started process 1042 to run task
+[2021-06-15 11:58:19,650] {standard_task_runner.py:76} INFO - Running: ['***', 'tasks', 'run', 'sparkPipe', 'run_spark_file', '2021-06-14T01:00:00+00:00', '--job-id', '5', '--pool', 'default_pool', '--raw', '--subdir', 'DAGS_FOLDER/run_spark_app.py', '--cfg-path', '/tmp/tmpajisobc6', '--error-file', '/tmp/tmp1s9vx5zu']
+[2021-06-15 11:58:19,654] {standard_task_runner.py:77} INFO - Job 5: Subtask run_spark_file
+[2021-06-15 11:58:20,063] {logging_mixin.py:104} INFO - Running <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [running]> on host 15f1191013a9
+[2021-06-15 11:58:20,536] {taskinstance.py:1282} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=sparkPipe
+AIRFLOW_CTX_TASK_ID=run_spark_file
+AIRFLOW_CTX_EXECUTION_DATE=2021-06-14T01:00:00+00:00
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2021-06-14T01:00:00+00:00
+[2021-06-15 11:58:20,556] {logging_mixin.py:104} INFO - log, this request failed
+[2021-06-15 11:58:20,559] {taskinstance.py:1481} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.6/urllib/request.py", line 1349, in do_open
+    encode_chunked=req.has_header('Transfer-encoding'))
+  File "/usr/local/lib/python3.6/http/client.py", line 1287, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/local/lib/python3.6/http/client.py", line 1333, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.6/http/client.py", line 1282, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/lib/python3.6/http/client.py", line 1042, in _send_output
+    self.send(msg)
+  File "/usr/local/lib/python3.6/http/client.py", line 980, in send
+    self.connect()
+  File "/usr/local/lib/python3.6/http/client.py", line 952, in connect
+    (self.host,self.port), self.timeout, self.source_address)
+  File "/usr/local/lib/python3.6/socket.py", line 724, in create_connection
+    raise err
+  File "/usr/local/lib/python3.6/socket.py", line 713, in create_connection
+    sock.connect(sa)
+OSError: [Errno 99] Cannot assign requested address
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/airflow/dags/dependencies/ApiCalls.py", line 24, in urllib_sync_api_request
+    with urllib.request.urlopen(url) as response:
+  File "/usr/local/lib/python3.6/urllib/request.py", line 223, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/local/lib/python3.6/urllib/request.py", line 526, in open
+    response = self._open(req, data)
+  File "/usr/local/lib/python3.6/urllib/request.py", line 544, in _open
+    '_open', req)
+  File "/usr/local/lib/python3.6/urllib/request.py", line 504, in _call_chain
+    result = func(*args)
+  File "/usr/local/lib/python3.6/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/usr/local/lib/python3.6/urllib/request.py", line 1351, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 99] Cannot assign requested address>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1137, in _run_raw_task
+    self._prepare_and_execute_task_with_callbacks(context, task)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1311, in _prepare_and_execute_task_with_callbacks
+    result = self._execute_task(context, task_copy)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1341, in _execute_task
+    result = task_copy.execute(context=context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python.py", line 150, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python.py", line 161, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/dependencies/ApiCalls.py", line 32, in urllib_sync_api_request
+    raise ValueError(e)
+ValueError: <urlopen error [Errno 99] Cannot assign requested address>
+[2021-06-15 11:58:20,636] {taskinstance.py:1531} INFO - Marking task as UP_FOR_RETRY. dag_id=sparkPipe, task_id=run_spark_file, execution_date=20210614T010000, start_date=20210615T115819, end_date=20210615T115820
+[2021-06-15 11:58:20,844] {local_task_job.py:151} INFO - Task exited with return code 1
+[2021-06-15 14:49:16,346] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 14:49:16,379] {taskinstance.py:876} INFO - Dependencies all met for <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [queued]>
+[2021-06-15 14:49:16,380] {taskinstance.py:1067} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 14:49:16,381] {taskinstance.py:1068} INFO - Starting attempt 2 of 5
+[2021-06-15 14:49:16,384] {taskinstance.py:1069} INFO - 
+--------------------------------------------------------------------------------
+[2021-06-15 14:49:16,399] {taskinstance.py:1087} INFO - Executing <Task(PythonOperator): run_spark_file> on 2021-06-14T01:00:00+00:00
+[2021-06-15 14:49:16,411] {standard_task_runner.py:52} INFO - Started process 497 to run task
+[2021-06-15 14:49:16,422] {standard_task_runner.py:76} INFO - Running: ['***', 'tasks', 'run', 'sparkPipe', 'run_spark_file', '2021-06-14T01:00:00+00:00', '--job-id', '48', '--pool', 'default_pool', '--raw', '--subdir', 'DAGS_FOLDER/run_spark_app.py', '--cfg-path', '/tmp/tmpk0ctgn2g', '--error-file', '/tmp/tmpzvd2bo63']
+[2021-06-15 14:49:16,424] {standard_task_runner.py:77} INFO - Job 48: Subtask run_spark_file
+[2021-06-15 14:49:16,527] {logging_mixin.py:104} INFO - Running <TaskInstance: sparkPipe.run_spark_file 2021-06-14T01:00:00+00:00 [running]> on host 4c4793da73b7
+[2021-06-15 14:49:16,723] {taskinstance.py:1282} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=sparkPipe
+AIRFLOW_CTX_TASK_ID=run_spark_file
+AIRFLOW_CTX_EXECUTION_DATE=2021-06-14T01:00:00+00:00
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2021-06-14T01:00:00+00:00
+[2021-06-15 14:49:16,727] {taskinstance.py:1481} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1137, in _run_raw_task
+    self._prepare_and_execute_task_with_callbacks(context, task)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1311, in _prepare_and_execute_task_with_callbacks
+    result = self._execute_task(context, task_copy)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/models/taskinstance.py", line 1341, in _execute_task
+    result = task_copy.execute(context=context)
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python.py", line 150, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.6/site-packages/airflow/operators/python.py", line 161, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/dependencies/ApiCalls.py", line 23, in urllib_sync_api_request
+    r = requests.get(url)
+NameError: name 'requests' is not defined
+[2021-06-15 14:49:16,732] {taskinstance.py:1531} INFO - Marking task as UP_FOR_RETRY. dag_id=sparkPipe, task_id=run_spark_file, execution_date=20210614T010000, start_date=20210615T144916, end_date=20210615T144916
+[2021-06-15 14:49:16,766] {local_task_job.py:151} INFO - Task exited with return code 1

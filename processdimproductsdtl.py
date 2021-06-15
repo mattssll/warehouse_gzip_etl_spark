@@ -4,7 +4,7 @@ from pyspark.context import SparkContext
 from pyspark.conf import SparkConf
 from baseLogger import configure_logger
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType, LongType, DoubleType, ArrayType
-from pyspark.ml.feature import Bucketizer, QuantileDiscretizer
+from pyspark.ml.feature import Bucketizer
 
 logger = configure_logger()
 logger.warn("Starting to process metadata")
@@ -18,10 +18,9 @@ spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \
     .config("spark.executor.memory", "8g") \
-    .config("spark.cores.max", "4") \
+    .config("spark.cores.max", "3") \
     .config("spark.driver.memory", "8g") \
     .getOrCreate()
-
 initialSchema = StructType([ \
     StructField("asin",StringType(),False), \
     StructField("categories", ArrayType(ArrayType(StringType())),True), \
@@ -48,11 +47,10 @@ def clean_data(path: str) -> DataFrame:
     df = df.withColumn("bought_together", df.related.bought_together).withColumn("bought_together", concat_ws(",",col("bought_together")))
     df = df.withColumn("buy_after_viewing", df.related.buy_after_viewing).withColumn("buy_after_viewing", concat_ws(",",col("buy_after_viewing")))
     df = df.withColumn("sales_rank_type", split(col("salesRank"), ':').getItem(0)).withColumn("sales_rank_type", regexp_replace(col("sales_rank_type"),'\{"','')).withColumn("sales_rank_type", regexp_replace(col("sales_rank_type"),'"',''))
-    df = df.withColumn("sales_rank_pos", split(col("salesRank"), ':').getItem(1)).withColumn("sales_rank_pos", regexp_replace(col("sales_rank_pos"),'}',''))
-    cols_to_drop = ['related', 'salesRank']
+    df = df.withColumn("sales_rank_pos", split(col("salesRank"), ':').getItem(1)).withColumn("sales_rank_pos", regexp_replace(col("sales_rank_pos"),'}','')).withColumn("sales_rank_pos", col("sales_rank_pos").cast("integer"))
+    cols_to_drop = ['related', 'salesRank', 'price', 'category']
     df = df.drop(*cols_to_drop)
-    #if drop_duplicates == True:
-    #df = df.dropDuplicates() # very heavypyt
+    #df = df.dropDuplicates()
     df = df.na.drop(subset=["asin"])
     print(df.printSchema())
     return df
@@ -64,32 +62,14 @@ def write_to_csv(df: DataFrame, path: str, compression: str) -> None:
 
 def create_sparksql_view_n_query(df: DataFrame, view_name:str, query: str) -> None:
     df.createOrReplaceTempView(view_name)
-    queriedDf = spark.sql(query.format(view_name))
+    query = spark.sql(query.format(view_name))
     logger.debug("writing to disk")
     #query.write.csv(path = "testarquivos" ,sep=",", header=True, lineSep="\n", escape='"', nullValue=None, compression="gzip")
     logger.info("Printing results from SQL Query")
-    queriedDf.show(20,truncate=True)
-    return queriedDf
+    query.show(20,truncate=True)
 
-def bucketize_df(df, numBuckets, outPath, hasDropFields, colsToDrop ):
-    df = df.na.drop(subset=["price"])
-    if hasDropFields:
-        df = df.drop(*colsToDrop)
-
-    buckets = QuantileDiscretizer(relativeError=0.01, handleInvalid="error", numBuckets=numBuckets, inputCol="price", outputCol="buckets")
-    dfWithBuckets = buckets.setHandleInvalid("keep").fit(df).transform(df)# \
-        #.write.csv(path = outPath ,sep=",", header=False, lineSep="\n", escape='"', nullValue=None, emptyValue='', compression=None)
-    dfWithBucketsMaxMin = create_sparksql_view_n_query(dfWithBuckets, 'dfWithBucketsMaxMin', 'SELECT buckets, min(price) as minprice, max(price) as maxPrice FROM {} GROUP BY buckets')
-    print(dfWithBucketsMaxMin.show())
-    return dfWithBuckets
 #9430088
 cleanedDf = clean_data("metadata/small*")
-
-#cleanedDf = clean_data("input_data/metadata.json.gzip-*")
-print(cleanedDf.show())
-#bucketizedDf = bucketize_df(cleanedDf, 20, './20bucketfiles', True, ['categories','title', 'imUrl','description', 'also_bought','also_viewed', 'bought_together', 'buy_after_viewing','brand','sales_rank_type', 'sales_rank_pos'])
-#bucketizedDf = bucketize_df(cleanedDf, 30, './30bucketfiles', True, ['categories','title', 'imUrl','description', 'also_bought','also_viewed', 'bought_together', 'buy_after_viewing','brand','sales_rank_type', 'sales_rank_pos'])
-#create_sparksql_view_n_query(bucketizedDf)
 #print(cleanedDf.printSchema())
 #print(cleanedDf.count())
 #print(type(cleanedDf))
@@ -98,7 +78,8 @@ print(cleanedDf.show())
 #print(cleanedDf.show(150,truncate=True))
 #create_sparksql_view_n_query(df = cleanedDf, view_name="pmetadata", query="SELECT * FROM {} LIMIT 1000000")
 
-#write_to_csv(cleanedDf, "/Users/mateus.leao/Documents/mattssll/takeaway/metadatatestjsongzip", compression="gzip")
+write_to_csv(cleanedDf, "/Users/mateus.leao/Documents/mattssll/takeaway/dimproductsdtl", compression="gzip")
+print(cleanedDf.printSchema())
 #helpers.info("the csvs were written successfully")
 
 """

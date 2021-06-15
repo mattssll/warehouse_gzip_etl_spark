@@ -14,3 +14,11 @@ __pycache__/
 logs.log
 /build/
 /click/
+output_data
+input_data
+dimproductsdtl
+dimproducts
+Bucket data
+json_split_csv
+json_splitfullgzip
+metadatatestjsongzip
