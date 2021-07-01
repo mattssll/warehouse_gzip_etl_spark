@@ -1,0 +1,10 @@
+[2021-06-30 20:25:44,358] {scheduler_job.py:182} INFO - Started process (PID=150) to work on /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:25:44,524] {scheduler_job.py:633} INFO - Processing file /opt/airflow/dags/run_spark_app.py for tasks to queue
+[2021-06-30 20:25:44,735] {logging_mixin.py:104} INFO - [2021-06-30 20:25:44,713] {dagbag.py:487} INFO - Filling up the DagBag from /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:25:44,804] {scheduler_job.py:645} WARNING - No viable dags retrieved from /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:25:44,890] {scheduler_job.py:190} INFO - Processing /opt/airflow/dags/run_spark_app.py took 1.017 seconds
+[2021-06-30 20:42:07,496] {scheduler_job.py:182} INFO - Started process (PID=69) to work on /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:42:07,543] {scheduler_job.py:633} INFO - Processing file /opt/airflow/dags/run_spark_app.py for tasks to queue
+[2021-06-30 20:42:07,555] {logging_mixin.py:104} INFO - [2021-06-30 20:42:07,554] {dagbag.py:487} INFO - Filling up the DagBag from /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:42:07,579] {scheduler_job.py:645} WARNING - No viable dags retrieved from /opt/airflow/dags/run_spark_app.py
+[2021-06-30 20:42:07,591] {scheduler_job.py:190} INFO - Processing /opt/airflow/dags/run_spark_app.py took 0.193 seconds

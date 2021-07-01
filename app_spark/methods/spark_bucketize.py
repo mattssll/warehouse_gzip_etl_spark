@@ -1,8 +1,8 @@
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.ml.feature import Bucketizer, QuantileDiscretizer
 
-from .spark_writes import create_sparksql_with_sql_query
-def create_session():
+
+def create_session() -> SparkSession:
     spark = SparkSession \
         .builder \
         .appName("getSparkSession") \
@@ -12,21 +12,23 @@ def create_session():
         .getOrCreate()
     return spark
 
+
 spark = create_session()
 
+
 # this could be separated better related to the 2 writes
-def bucketize_df(df: DataFrame, numBuckets: int,  \
-            outPathDimProducts:str, hasDropFields: bool, \
-            colsToDrop: ["str"], compression: str):
+def bucketize_df(df: DataFrame, numBuckets: int, \
+                 outPathDimProducts: str, hasDropFields: bool, \
+                 colsToDrop: ["str"], compression: str) -> DataFrame:
     " This function does ..."
     if hasDropFields:
         df = df.drop(*colsToDrop)
     buckets = QuantileDiscretizer(relativeError=0.01, handleInvalid="error", \
-    numBuckets=numBuckets, inputCol="price", outputCol="bucketID")
+                                  numBuckets=numBuckets, inputCol="price", outputCol="bucketID")
     dfWithBuckets = buckets.setHandleInvalid("keep").fit(df).transform(df)
     dfWithBucketsToWrite = dfWithBuckets
     # Write dimension_products
     df = df.na.drop(subset=["price"])
-    dfWithBucketsToWrite.write.csv(path = outPathDimProducts ,sep=",", header=False, lineSep="\n", \
-        escape='"', nullValue=None, emptyValue='', compression=compression)
+    dfWithBucketsToWrite.write.csv(path=outPathDimProducts, sep=",", header=False, lineSep="\n", \
+                                   escape='"', nullValue=None, emptyValue='', compression=compression)
     return dfWithBuckets

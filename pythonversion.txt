@@ -1,0 +1,2 @@
+I used python 3.8.3 and also tested with 3.9 and the dependencies would build.
+Airflow and pyspark are within the dependencies of python
