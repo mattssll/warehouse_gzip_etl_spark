@@ -15,7 +15,7 @@ default_args = {
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
     'owner': 'airflow',
-    'email': "mateusleao81@gmail.com",
+    'email': "yoursenderemailhere@gmail.com", # this has to be configured w send grid for ej.
     'email_on_failure': True,
     'email_on_retry': True,
 }
